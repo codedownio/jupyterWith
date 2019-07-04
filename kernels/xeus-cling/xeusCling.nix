@@ -7,6 +7,9 @@
 , cling
 , pugixml
 , gcc
+, clang
+, ncurses
+, zlib
 }:
 let
   xtl = stdenv.mkDerivation {
@@ -19,11 +22,11 @@ let
           sha256 = "0xy040b4b5a39kxqnj7r0bm64ic13szrli8ik95xvfh26ljh8c7q";
         };
 
-      buildInputs = [ cmake gcc ];
+      buildInputs = [ cmake clang ];
 
       preConfigure = ''
-        export CC=${gcc}/bin/gcc
-        export CXX=${gcc}/bin/g++
+        export CC=${clang}/bin/cc
+        export CXX=${clang}/bin/c++
       '';
 
       buildPhase = ''
@@ -39,10 +42,10 @@ let
           rev = "e89c946451cfdb7392b12bc6c3674b548ea5c0ee";
           sha256 = "16rgp9rgdza82zcbh9r9i7k2yblkz2fd3ig64035fny2p6pxw6lm";
         };
-      buildInputs = [ cmake gcc ];
+      buildInputs = [ cmake clang ];
 
       preConfigure = ''
-        export CXX=${gcc}/bin/g++
+        export CXX=${clang}/bin/c++
       '';
 
       buildPhase = ''
@@ -61,11 +64,11 @@ let
           rev = "d641d1de4c8aa7f2dc674d80b3a71469364b9534";
           sha256 = "0n8xfpydrqxbzdcpmamnw27r02rslxj2rf6hp4n79ljqm5smq385";
         };
-      buildInputs = [ cmake zeromq gcc ];
+      buildInputs = [ cmake zeromq clang ];
 
       preConfigure = ''
-        export CC=${gcc}/bin/gcc
-        export CXX=${gcc}/bin/g++
+        export CC=${clang}/bin/cc
+        export CXX=${clang}/bin/c++
       '';
     };
 
@@ -79,11 +82,11 @@ let
           sha256 = "0hhw52plq7nyh1v040h1afw0kaq8rha7hvwyw8nnyyvb9kbnkqqs";
         };
 
-      buildInputs = [ cmake gcc ];
+      buildInputs = [ cmake clang ];
 
       preConfigure = ''
-        export CC=${gcc}/bin/gcc
-        export CXX=${gcc}/bin/g++
+        export CC=${clang}/bin/cc
+        export CXX=${clang}/bin/c++
       '';
   };
 
@@ -138,6 +141,7 @@ let
 
   xeus = stdenv.mkDerivation {
       name = "xeus";
+
       src = fetchFromGitHub {
           owner = "QuantStack";
           repo = "xeus";
@@ -145,11 +149,11 @@ let
           sha256 = "0sk2g45jg09crdzx0kkbr6s5890z3ybfynwx2xbchrcvc9mgc3bd";
         };
 
-        buildInputs = [ cmake zeromq cppzmq cryptopp nlohmannJson xtl pkgconfig libuuid gcc ];
+        buildInputs = [ cmake zeromq cppzmq cryptopp nlohmannJson xtl pkgconfig libuuid clang ];
 
         configurePhase = ''
-          export CC=${gcc}/bin/gcc
-          export CXX=${gcc}/bin/g++
+          export CC=${clang}/bin/cc
+          export CXX=${clang}/bin/c++
           mkdir build
           cd build
           cmake -DBUILD_EXAMPLES=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$out ..
@@ -158,15 +162,20 @@ let
 
   xeusCling = stdenv.mkDerivation {
       name = "xeusCling";
+
       src = fetchFromGitHub {
           owner = "QuantStack";
           repo = "xeus-cling";
           rev = "1974c29977a87531dfd39377be32d713aa26ecf2";
           sha256 = "0i48ywiz7sgvln106phs0syd00kly0sirr8ib2hlri32j5awph8v";
         };
-      buildInputs = [ cmake zeromq cppzmq xeus libuuid xtl pkgconfig cling pugixml cxxopts nlohmannJson ];
+
+      buildInputs = [ cmake zeromq cppzmq xeus libuuid xtl pkgconfig cling pugixml cxxopts nlohmannJson clang ncurses zlib ];
 
       configurePhase = ''
+        export CC=${clang}/bin/cc
+        export CXX=${clang}/bin/c++
+
         echo "=======> CHECK RTTI"
         llvm-config --has-rtti
         mkdir build
